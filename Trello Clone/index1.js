@@ -503,7 +503,6 @@ const card2 = new TaskCard(
 card1.assignedTo = memberA1;
 card1.addLabel(new Label("Design", "#FF5733"));
 
-
 // Add comments
 
 card1.addComment(adminA1, "Please include mobile responsive design");
@@ -511,8 +510,8 @@ card1.addComment(memberA1, "Will do!");
 card1.Priority = "high";
 
 //card2
-card2.assignedTo= memberB1
-card2.Priority= 'low';
+card2.assignedTo = memberB1;
+card2.Priority = "low";
 card2.addLabel(new Label("Design", "#FF5733"));
 card2.addComment(adminA1, "Please include mobile responsive design");
 card2.addComment(memberA1, "Will do!");
@@ -524,7 +523,5 @@ boardB.lists[0].addCard(card2);
 
 boardA.moveCardBetweenLists(card1.id, "To Do", "In Progress");
 
-
-
 console.log(boardB.getBoardStats());
-console.log(boardA.searchCards("Aboutpage"));
+console.log(boardA.searchCards("Aboutpage")); 
