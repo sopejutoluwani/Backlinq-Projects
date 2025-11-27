@@ -11,6 +11,7 @@ class Account {
   }
 
   deposit(amount) {
+    
     if (amount >= 0) {
       this.#balance += amount;
       //console.log(`Deposited: $${amount}. New Balance: $${this.#balance}`);
@@ -89,6 +90,7 @@ class Account {
 
 
 }
+
 
 const acct1 = new Account(12345679809, "tolu");
 const acct2 = new Account(5555555555, "titus");
