@@ -34,8 +34,10 @@ class Account {
     }
 
     if (amount > this.#balance) {
-      console.log("Insufficient Funds");
-      return;
+      console.log("Warning: withdrawing more than balance!");
+      this.#balance -= amount; // allows negative balance
+    } else {
+      this.#balance -= amount;
     }
 
     if (amount <= this.#balance) {
@@ -50,6 +52,7 @@ class Account {
   }
 
   getBalance() {
+    console.log(`Current Balance: $${this.#balance}`);
     return this.#balance;
   }
 
@@ -168,6 +171,11 @@ class CheckingAccount extends Account {
 
   //Available overdraft
   getAvailableBalanceToOverdraft() {
+    console.log(
+      `Available balance including overdraft: $${
+        this.getBalance() + this.overdraftLimit
+      }`
+    );
     return this.getBalance() + this.overdraftLimit;
   }
 }
@@ -222,7 +230,7 @@ class InvestmentAccount extends Account {
       price: pricePerShare,
     });
     console.log(
-      `Bought ${shares} shares of ${stockName} at $${purchasePrice} each.`
+      `Bought ${shares} shares of ${stockName} at $${pricePerShare} each.`
     );
   }
 
@@ -249,7 +257,8 @@ class InvestmentAccount extends Account {
       return;
     }
 
-    totalCost = shares * pricePerShare;
+    const totalCost = shares * pricePerShare;
+
     this.deposit(totalCost);
     // remove the sold shares from the owned shares
     currentShares.shares -= shares;
@@ -265,13 +274,111 @@ class InvestmentAccount extends Account {
   }
 
   //getting the total value of my portfolio
+  getPortfolioValue() {
+    let portfolioValue = 0;
+    this.holdings.stocks.forEach((stock) => {
+      const stockValue = stock.shares * stock.price;
+      //console.log(stock.shares)
+      portfolioValue += stockValue;
+    });
+
+    console.log(`you portfolio is valued at: $${portfolioValue}`);
+    return portfolioValue;
+  }
 }
 
-const acct1 = new Account(12345679809, "tolu");
-const acct2 = new Account(5555555555, "titus");
-acct1.deposit(1000);
-acct1.calculateInterest(8);
-//acct1.withdraw(500);
-//acct1.transfer(acct2, 400);
-//acct1.getTransactionHistory();
-//acct2.getTransactionHistory()
+//Customer Management
+class Customer {
+  #pin;
+  constructor(customerId, name, email, phone, address) {
+    this.customerId = this.generateId();
+    this.name = name;
+    this.email = email;
+    this.phone = phone;
+    this.address = address;
+    this.accounts = [];
+    this.#pin = Math.floor(1000 + Math.random() * 9000); //generate a 4 digit pin
+  }
+
+  //validate PIN
+  validatePIN(inputPIN) {
+    return this.#pin === inputPIN;
+  }
+
+  //change PIN
+  changePIN(oldPIN, newPIN) {
+    if (this.validatePIN(oldPIN)) {
+      this.#pin = newPIN;
+      console.log("PIN changed successfully");
+    } else {
+      console.log("Invalid old PIN. PIN change failed.");
+    }
+  }
+
+  //generate unique customer ID
+  generateId() {
+    return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+  }
+
+  //add account to customer
+  addAccount(account) {
+    this.accounts.push(account);
+    console.log(
+      `Account number ${account.accountNumber} is been added to the accounts of customer with customer ID: ${this.customerId}`
+    );
+  }
+
+  //get total balance
+  getTotalBalance() {
+    let totalBalance = 0;
+    this.accounts.forEach((acct) => {
+      const balance = acct.getBalance();
+      totalBalance += balance;
+    });
+    console.log(totalBalance);
+    return totalBalance;
+  }
+
+  //customer profile info
+  getCustomerInfo() {
+    return {
+      cusutomerName: this.name,
+      totalBalance: this.getTotalBalance(),
+      NumOfAccounts: this.accounts.Accounts.length,
+    };
+  }
+}
+
+// const acct1 = new InvestmentAccount(12345679809, "tolu");
+// const acct2 = new Account(5555555555, "titus");
+// acct1.deposit(10000);
+// acct1.riskLevel = "low";
+// //acct1.calculateInterest(8);
+// // acct1.withdraw(500);
+// // acct1.transfer(acct2, 400);
+// // acct1.getTransactionHistory();
+// // acct2.getTransactionHistory()
+// acct1.buyStocks("AAPL", 5, 150);
+// acct1.buyStocks("GOOGL", 2, 2800);
+// acct1.getBalance();
+// acct1.getPortfolioValue();
+// acct1.sellStocks("AAPL", 2, 155);
+// acct1.getPortfolioValue();
+// acct1.getBalance();
+// acct1.calculateInterest(6);
+//create new customer
+const customer1 = new Customer(
+  1,
+  "Tolu Ade",
+  "toluAde@example.com",
+  "123-456-7890",
+  "123 Main St"
+);
+const savingsAcct = new SavingsAccount(1001, customer1.name, 5000);
+const checkingAcct = new CheckingAccount(1002, customer1.name, 2000);
+customer1.addAccount(savingsAcct);
+customer1.addAccount(checkingAcct);
+savingsAcct.deposit(1500);
+checkingAcct.withdraw(2500); //within overdraft limit
+checkingAcct.getAvailableBalanceToOverdraft();
+customer1.getTotalBalance();
