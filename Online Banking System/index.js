@@ -291,7 +291,7 @@ class InvestmentAccount extends Account {
 class Customer {
   #pin;
   constructor(customerId, name, email, phone, address) {
-    this.customerId = this.generateId();
+    this.customerId = customerId;
     this.name = name;
     this.email = email;
     this.phone = phone;
@@ -300,6 +300,10 @@ class Customer {
     this.#pin = Math.floor(1000 + Math.random() * 9000); //generate a 4 digit pin
   }
 
+  //get pin
+  get pin() {
+    return this.#pin;
+  }
   //validate PIN
   validatePIN(inputPIN) {
     return this.#pin === inputPIN;
@@ -315,11 +319,6 @@ class Customer {
     }
   }
 
-  //generate unique customer ID
-  generateId() {
-    return Date.now().toString() + Math.floor(Math.random() * 1000).toString();
-  }
-
   //add account to customer
   addAccount(account) {
     this.accounts.push(account);
@@ -328,29 +327,158 @@ class Customer {
     );
   }
 
+  //get accounts balance for each account
+  getAccountsBalance() {
+    const balances = this.accounts.map((acct) => {
+      return {
+        accountNumber: acct.accountNumber,
+        accountType: acct.accountType,
+        balance: acct.getBalance(),
+      };
+    });
+    return balances;
+  }
+
   //get total balance
   getTotalBalance() {
-    let totalBalance = 0;
-    this.accounts.forEach((acct) => {
-      const balance = acct.getBalance();
-      totalBalance += balance;
-    });
-    console.log(totalBalance);
-    return totalBalance;
+    return this.accounts.reduce((sum, acct) => sum + acct.getBalance(), 0);
   }
 
   //customer profile info
   getCustomerInfo() {
     return {
-      cusutomerName: this.name,
+      customerName: this.name,
       totalBalance: this.getTotalBalance(),
-      NumOfAccounts: this.accounts.Accounts.length,
+      NumOfAccounts: this.accounts.length,
     };
   }
 }
 
+//Bank System Management
+class Bank {
+  static #instance = null; //  static private property to hold the single instance
+
+  //initialize private fields
+  #customers = [];
+  #currentCustomer = null; // private fields
+
+  constructor() {
+    //  static property to hold the single instance
+    if (Bank.#instance) {
+      return Bank.#instance; //returns existing instance
+    }
+
+    Bank.#instance = this; //store the instance
+  }
+
+  static getInstance() {
+    if (!Bank.#instance) {
+      Bank.#instance = new Bank();
+    }
+    return Bank.#instance;
+  }
+
+  //method to register customers
+  registerCustomers(name, email, phone, address, pin) {
+    const customerId =
+      Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+
+    const newCustomer = new Customer(customerId, name, email, phone, address);
+    const defaultPin = newCustomer.pin; //get default pin created
+
+    newCustomer.changePIN(defaultPin, pin); //change default pin
+
+    this.#customers.push(newCustomer); //add new customer to the db.
+    console.log("Customer registered:", customerId);
+    return newCustomer;
+  }
+
+  //login method
+  login(customerId, pin) {
+    //check customers list to see if customer id exists
+    const customer = this.#customers.find((c) => {
+      return c.customerId === customerId;
+    });
+
+    if (!customer) {
+      //if customer is not found
+      console.log("Customer does not exist");
+      return false;
+    }
+    // confirm the pin
+    if (!customer.validatePIN(pin)) {
+      console.log("Incorrect Pin");
+      return false;
+    }
+
+    this.#currentCustomer = customer; //set current customer
+    console.log("Login successful");
+    return true;
+  }
+
+  //getting the current customer
+  getCurrentCustomer() {
+    return this.#currentCustomer;
+  }
+
+  //generate 10 digits account number
+  static generateAccountNumber() {
+    return Math.floor(1000000000 + Math.random() * 9000000000);
+  }
+
+  // create account
+  createAccount(accountType, initialDeposit) {
+    if (!this.#currentCustomer) {
+      //check if customer is logged in
+      console.log("Please login to create an account");
+      return null;
+    }
+
+    const holderName = this.#currentCustomer.name; //get current customer name
+    const accountNumber = Bank.generateAccountNumber(); //only the bank class can generate account number
+
+    let newAccount;
+
+    switch (accountType) {
+      case "savings":
+        newAccount = new SavingsAccount(
+          accountNumber,
+          holderName,
+          initialDeposit
+        );
+        console.log("New Savings account created");
+        return newAccount;
+      case "checking":
+        newAccount = new CheckingAccount(
+          accountNumber,
+          holderName,
+          initialDeposit
+        );
+        console.log("New checking account created");
+        return newAccount;
+      case "investment":
+        newAccount = new InvestmentAccount(
+          accountNumber,
+          holderName,
+          initialDeposit
+        );
+        console.log("New investment account created");
+        return newAccount;
+      default:
+        console.log("Invalid account type");
+        return;
+    }
+  }
+
+  //method to get All customers
+  getAllCustomers() {
+    return this.#customers;
+  }
+}
+
+
 // const acct1 = new InvestmentAccount(12345679809, "tolu");
-// const acct2 = new Account(5555555555, "titus");
+// const acct2 = new Account(5555555555, newCheckingAccount
 // acct1.deposit(10000);
 // acct1.riskLevel = "low";
 // //acct1.calculateInterest(8);
@@ -367,18 +495,34 @@ class Customer {
 // acct1.getBalance();
 // acct1.calculateInterest(6);
 //create new customer
-const customer1 = new Customer(
-  1,
-  "Tolu Ade",
-  "toluAde@example.com",
-  "123-456-7890",
-  "123 Main St"
+// const customer1 = new Customer(
+//   1,
+//   "Tolu Ade",
+//   "toluAde@example.com",
+//   "123-456-7890",
+//   "123 Main St"
+// );
+// const savingsAcct = new SavingsAccount(1001, customer1.name, 5000);
+// const checkingAcct = new CheckingAccount(1002, customer1.name, 2000);
+// customer1.addAccount(savingsAcct);
+// customer1.addAccount(checkingAcct);
+// savingsAcct.deposit(1500);
+// checkingAcct.withdraw(2500); //within overdraft limit
+// checkingAcct.getAvailableBalanceToOverdraft();
+// customer1.getTotalBalance();
+
+const bank = Bank.getInstance();
+const cust = bank.registerCustomers(
+  "John",
+  "john@gmail.com",
+  "0801...",
+  "Lagos",
+  2222
 );
-const savingsAcct = new SavingsAccount(1001, customer1.name, 5000);
-const checkingAcct = new CheckingAccount(1002, customer1.name, 2000);
-customer1.addAccount(savingsAcct);
-customer1.addAccount(checkingAcct);
-savingsAcct.deposit(1500);
-checkingAcct.withdraw(2500); //within overdraft limit
-checkingAcct.getAvailableBalanceToOverdraft();
-customer1.getTotalBalance();
+console.log(`Customer ID: ${cust.customerId}`);
+bank.login(cust.customerId, 2222);
+const savingsAccount = bank.createAccount("savings", 5000);
+const checkingAccount = bank.createAccount("checking", 2000);
+cust.addAccount(savingsAccount);
+cust.addAccount(checkingAccount);
+console.log(cust.getAccountsBalance());
