@@ -476,7 +476,57 @@ class Bank {
   }
 }
 
+//Utilities
 
+//transaction class
+class Transaction {
+  static lastId = 0; // shared across all transactions
+
+  constructor(type, amount, description, balanceAfter, date = new Date()) {
+    this.id = Transaction.generateId();
+    this.type = type;
+    this.amount = amount;
+    this.date = date;
+    this.description = description;
+    this.balanceAfter = balanceAfter;
+  }
+
+  static generateId() {
+    return ++Transaction.lastId; // increments and returns
+  }
+
+  getFormattedDate() {
+    return this.date.toLocaleString();
+  } 
+}
+
+//validator class
+class Validator {
+  // Validate email using a basic regex pattern
+  static validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Validate phone number (Nigerian format example: 11 digits or starts with +234)
+  static validatePhone(phone) {
+    const phoneRegex = /^(?:\+234|0)\d{10}$/;
+    return phoneRegex.test(phone);
+  }
+
+  // Validate pin (must be exactly 4 digits)
+  static validatePin(pin) {
+    const pinRegex = /^\d{4}$/;
+    return pinRegex.test(pin);
+  }
+
+  // Validate amount (must be a number and must be > 0)
+  static validateAmount(amount) {
+    return typeof amount === "number" && amount > 0;
+  }
+}
+
+export default Validator;
 // const acct1 = new InvestmentAccount(12345679809, "tolu");
 // const acct2 = new Account(5555555555, newCheckingAccount
 // acct1.deposit(10000);
