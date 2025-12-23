@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toluwani Trust Bank</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* RESET & BASE STYLES */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0f2027,
+          #203a43,
+          #2c5364
+        ); /* Deep trustworthy blue gradient */
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        padding: 20px;
+      }
+
+      /* --- AUTH CONTAINER (Login/Register) --- */
+      .auth-container {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 480px;
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.6s ease-out;
+      }
+
+      /* --- DASHBOARD CONTAINER --- */
+      .dashboard-container {
+        background-color: #ffffff;
+        width: 100%;
+        max-width: 900px; /* Wider for dashboard */
+        padding: 40px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.6s ease-out;
+        display: none; /* Hidden by default */
+      }
+
+      /* GENERAL TYPOGRAPHY */
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a3b5d; /* Brand Blue */
+        text-align: center;
+        margin-bottom: 8px;
+      }
+
+      h2 {
+        font-size: 20px;
+        color: #1a3b5d;
+        margin-bottom: 16px;
+        text-align: left;
+        border-bottom: 2px solid #f0f2f5;
+        padding-bottom: 8px;
+      }
+
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c5364;
+        margin-bottom: 5px;
+      }
+
+      p {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+      .mb-4 {
+        margin-bottom: 24px;
+      }
+
+      /* AUTH TABS */
+      .auth-tabs {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        background: #f0f2f5;
+        padding: 5px;
+        border-radius: 8px;
+      }
+
+      .auth-tabs button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 600;
+        color: #666;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+      }
+
+      .auth-tabs button.active {
+        background-color: #1a3b5d;
+        color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      /* FORMS */
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      #login-form,
+      #register-form {
+        display: none;
+        animation: slideUp 0.4s ease;
+      }
+      .form-visible {
+        display: block !important;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #4a5568;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        margin-bottom: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+        background-color: #f8fafc;
+      }
+
+      input:focus {
+        outline: none;
+        border-color: #1a3b5d;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(26, 59, 93, 0.1);
+      }
+
+      /* BUTTONS */
+      .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background-color: #1a3b5d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s;
+        margin-top: 10px;
+      }
+
+      .btn-primary:hover {
+        background-color: #132c45;
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background-color: #e2e8f0;
+        color: #1a3b5d;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      .btn-small:hover {
+        background-color: #cbd5e1;
+      }
+
+      .btn-logout {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+      .btn-logout:hover {
+        background-color: #fecaca;
+      }
+
+      /* --- DASHBOARD SPECIFIC STYLES --- */
+
+      /* Header Area */
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      /* Account Cards Grid */
+      .account-overview {
+        margin-bottom: 30px;
+      }
+
+      .account-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .account-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #1a3b5d; /* Brand accent */
+        padding: 20px;
+        border-radius: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .account-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .account-card p {
+        margin: 5px 0;
+      }
+      .account-card .balance {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-top: 10px;
+      }
+
+      /* Action Buttons */
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .actions button {
+        flex: 1;
+        min-width: 140px;
+        padding: 12px;
+        background-color: #1a3b5d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+
+      .actions button:hover {
+        background-color: #2c5364;
+      }
+
+      /* Transactions Table */
+      .transactions {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      thead tr {
+        background-color: #f1f5f9;
+        text-align: left;
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      th {
+        color: #475569;
+        font-weight: 600;
+      }
+
+      /* Zebra striping for readability */
+      tbody tr:hover {
+        background-color: #f8fafc;
+      }
+
+      /* Color coding for amounts */
+      .amount-pos {
+        color: #16a34a;
+        font-weight: 600;
+      }
+      .amount-neg {
+        color: #dc2626;
+        font-weight: 600;
+      }
+
+      /* --- MODAL STYLES --- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6); /* Dimmed background */
+        display: none; /* Hidden by default */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .btn-create {
+        background-color: #1a3b5d;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .btn-cancel {
+        background-color: transparent;
+        color: #64748b;
+        padding: 10px 20px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .btn-cancel:hover {
+        background-color: #f1f5f9;
+        color: #334155;
+      }
+      .btn-create:hover {
+        background-color: #132c45;
+      }
+
+      /* ANIMATIONS */
+      /* ANIMATIONS */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes modalPop {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 600px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+        .dashboard-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .dashboard-header button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="auth-container">
+      <div>
+        <h1>Welcome to Toluwani Trust Bank</h1>
+        <p>Your trusted partner in online banking.</p>
+
+        <div class="auth-tabs">
+          <button id="login-tab">Login</button>
+          <button id="register-tab">Register</button>
+        </div>
+
+        <div>
+          <form action="" id="login-form" class="" style="display: none">
+            <div>
+              <h2>Login</h2>
+              <label for="login-customerID">Customer ID:</label>
+              <input
+                type="text"
+                id="login-customerID"
+                name="login-customerID"
+                required
+              />
+
+              <label for="login-pin">Pin:</label>
+              <input
+                type="password"
+                id="login-pin"
+                name="login-pin"
+                maxlength="4"
+                required
+              />
+
+              <button class="btn-small" type="submit">Login</button>
+            </div>
+          </form>
+        </div>
+
+        <div>
+          <form action="" id="register-form" class="" style="display: none">
+            <div>
+              <h2>Register</h2>
+              <label for="register-name">Name:</label>
+              <input
+                type="text"
+                id="register-name"
+                name="register-name"
+                required
+              />
+
+              <label for="register-email">Email:</label>
+              <input
+                type="email"
+                id="register-email"
+                name="register-email"
+                required
+              />
+
+              <label for="register-pin">Pin:</label>
+              <input
+                type="password"
+                id="register-pin"
+                name="register-pin"
+                maxlength="4"
+                required
+              />
+
+              <label for="register-phone">Phone Number:</label>
+              <input
+                type="tel"
+                id="register-phone"
+                name="register-phone"
+                required
+              />
+              <label for="register-address">Address:</label>
+              <input
+                type="text"
+                id="register-address"
+                name="register-address"
+                required
+              />
+
+              <button class="btn-small" type="submit">Register</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!--Dashboard Section-->
+    <section
+      id="dashboard-section"
+      class="dashboard-container"
+      style="display: none"
+    >
+      <div class="dashboard-header">
+        <div>
+          <h1 style="text-align: left">
+            Welcome, <span id="user-name-display">Customer</span>
+          </h1>
+          <p style="text-align: left; margin: 0">
+            Customer ID: <span id="user-id-display">8839201</span>
+          </p>
+        </div>
+        <button class="btn-small btn-logout" id="logout-button">Logout</button>
+      </div>
+
+      <div class="account-overview">
+        <div class="account-header">
+          <h2>My Accounts</h2>
+          <button class="btn-small" id="open-account-button">
+            Open New Account
+          </button>
+        </div>
+
+        <div class="cards-grid" id="cards-grid">
+          <!-- Account cards will be dynamically inserted here -->
+        </div>
+      </div>
+      <div class="account-actions">
+        <div class="actions">
+          <button id="transfer-funds">Transfer Funds</button>
+          <button id="withdraw-funds">Withdraw Funds</button>
+          <button id="deposit-funds">Deposit Funds</button>
+        </div>
+        <div class="transactions">
+          <h2>Recent Transactions</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2024-01-15</td>
+                <td>Deposit</td>
+                <td>+$1,000.00</td>
+                <td>$6,000.00</td>
+              </tr>
+              <tr>
+                <td>2024-01-10</td>
+                <td>Withdrawal</td>
+                <td>-$200.00</td>
+                <td>$5,000.00</td>
+              </tr>
+              <tr>
+                <td>2024-01-05</td>
+                <td>Transfer to Savings</td>
+                <td>-$500.00</td>
+                <td>$5,200.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW ACCOUNT MODAL -->
+    <div id="account-modal" class="modal-overlay">
+      <div class="modal-content">
+        <h2>Open New Account</h2>
+        <form id="new-account-form" onsubmit="handleCreateAccount(event)">
+          <label for="account-type">Account Type</label>
+          <select id="account-type" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="Savings">Savings Account</option>
+            <option value="Checkings">Checkings Account</option>
+            <option value="Investment">Investment Account</option>
+          </select>
+
+          <label for="initial-deposit">Initial Deposit</label>
+          <input
+            type="number"
+            id="initial-deposit"
+            placeholder="0.00"
+            min="0"
+            step="0.01"
+            required
+          />
+
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-create">CREATE</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT FOR TAB FUNCTIONALITY -->
+
+    <script>
+      // Tab Switching Logic
+      const loginTab = document.getElementById("login-tab");
+      const registerTab = document.getElementById("register-tab");
+      const loginForm = document.getElementById("login-form");
+      const registerForm = document.getElementById("register-form");
+
+      loginTab.addEventListener("click", () => {
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+        loginForm.classList.add("form-visible");
+        loginForm.classList.remove("form-hidden");
+        registerForm.classList.add("form-hidden");
+        registerForm.classList.remove("form-visible");
+      });
+      registerTab.addEventListener("click", () => {
+        registerTab.classList.add("active");
+        loginTab.classList.remove("active");
+        registerForm.classList.add("form-visible");
+        registerForm.classList.remove("form-hidden");
+        loginForm.classList.add("form-hidden");
+        loginForm.classList.remove("form-visible");
+      });
+    </script>
+    <script>
+      class Account {
+        #balance;
+        #transactionsHistory = [];
+        constructor(accountNumber, accountHolder, initialBalance = 0) {
+          this.accountNumber = accountNumber;
+          this.accountHolder = accountHolder;
+          this.#balance = initialBalance;
+        }
+
+        deposit(amount) {
+          //check whether amount is valid that is greater than 0
+          if (amount < 0) {
+            console.log("Deposited amount must be greater than 0");
+            return;
+          }
+
+          //proceed to deposit
+          this.#balance += amount;
+          //console.log(`Deposited: $${amount}. New Balance: $${this.#balance}`);
+          this.#recordtransaction(
+            "deposit",
+            amount,
+            `${this.accountHolder} deposited`
+          );
+        }
+
+        withdraw(amount) {
+          //check whether amount is valid that is greater than 0
+          if (amount < 0) {
+            console.log("Amount must be greater than 0");
+            return;
+          }
+
+          //check whether amount is greater than balance
+          if (amount > this.#balance) {
+            console.log("Warning: Insufficient funds!");
+            return;
+          }
+
+          if (amount <= this.#balance) {
+            this.#balance -= amount;
+            console.log(`Withdrew: $${amount}. New Balance: $${this.#balance}`);
+            this.#recordtransaction(
+              "withdrawal",
+              amount,
+              `${this.accountHolder} withdrew`
+            );
+          }
+        }
+
+        getBalance() {
+          console.log(`Current Balance: $${this.#balance}`);
+          return this.#balance;
+        }
+
+        adjustBalance(amount) {
+          this.#balance += amount;
+        }
+
+        setBalance(newBalance) {
+          this.#balance = newBalance;
+          console.log(`Current Balance + Overdraft: $${this.#balance}`);
+        }
+
+        transfer(targetAccount, amount) {
+          //check if target account exists
+          if (!targetAccount) {
+            console.log("target account does not exist");
+            return;
+          }
+          if (amount > this.#balance) {
+            console.log("insufficient funds");
+            return;
+          }
+
+          if (amount > 0) {
+            this.withdraw(amount);
+            targetAccount.deposit(amount);
+            //console.log(`Transferred: $${amount} to Account No: ${targetAccount.accountNumber}`);
+            this.#recordtransaction(
+              "transfer",
+              amount,
+              `Transferred to Account No: ${targetAccount.accountNumber}`
+            );
+          }
+        }
+
+        #recordtransaction(type, amount, description) {
+          this.#transactionsHistory.push({ type, amount, description });
+          //console.log(this.#transactionsHistory)
+        }
+
+        recordTransaction(type, amount, description) {
+          this.#transactionsHistory.push(type, amount, description);
+        }
+
+        getTransactionHistory() {
+          console.log(this.#transactionsHistory);
+          return this.#transactionsHistory;
+        }
+
+        //interest rate
+        #interestRate() {
+          return 0.25; //25% annual interest rate
+        }
+
+        calculateInterest(timeInMonths) {
+          const interest =
+            (this.#balance * this.#interestRate() * timeInMonths) / 12;
+          console.log(
+            `Interest accured in ${timeInMonths} months: $${interest}`
+          );
+          return interest;
+        }
+      }
+
+      //Diffrent types of Account attached to Account class
+
+      class SavingsAccount extends Account {
+        constructor(
+          accountNumber,
+          accountHolder,
+          initialDeposit,
+          accountType = "savings",
+          interestRate = 0.3,
+          minimumBalance = 100
+        ) {
+          if (initialDeposit < minimumBalance) {
+            throw new Error(
+              `Initail deposit must be at least $${minimumBalance}`
+            );
+          }
+          super(accountNumber, accountHolder, initialDeposit);
+          this.accountType = accountType;
+          this.interestRate = interestRate;
+          this.minimumBalance = minimumBalance;
+        }
+
+        //Overriding withdraw method
+        withdraw(amount) {
+          //make sure minimum balance is maintained
+          if (this.getBalance() - amount < this.minimumBalance) {
+            // get balance from parent class then check if the withdraw will go below minimum balance
+            console.log(
+              `Cannot withdraw. Minimum balance of $${this.minimumBalance} must be maintained.`
+            );
+            return;
+          }
+          super.withdraw(amount); //call parent class withdraw method
+        }
+
+        //Overriding interest rate method
+        #interestRate() {
+          return this.interestRate;
+        }
+
+        calculateInterest(timeInMonths) {
+          const interest =
+            (this.getBalance() * this.interestRate * timeInMonths) / 12;
+          console.log(
+            `Interest accured in ${timeInMonths} months: $${interest}`
+          );
+          return interest;
+        }
+      }
+
+      //Checking Account
+      class CheckingAccount extends Account {
+        constructor(
+          accountNumber,
+          accountHolder,
+          initialBalance,
+          accountType = "checkings",
+          overdraftLimit = 500
+        ) {
+          super(accountNumber, accountHolder, initialBalance);
+          this.accountType = accountType;
+          this.overdraftLimit = overdraftLimit;
+        }
+
+        //Overriding withdraw method
+        // my solution
+        // withdraw(amount) {
+        //   const availableBalance = this.getBalance() + this.overdraftLimit;
+        //   this.setBalance(availableBalance)
+        //   if (amount > availableBalance) {
+        //     console.log("Withdrawal exceeds overdraft limit. Available balance: $"+availableBalance);
+        //     return;
+        //   }
+        //   if (amount <= this.getBalance())  {
+        //     super.withdraw(amount);
+        //     }
+        //   }
+
+        withdraw(amount) {
+          const realBalance = this.getBalance();
+          const availableBalance = realBalance + this.overdraftLimit;
+
+          // 1. Validate amount
+          if (amount <= 0) {
+            console.log("Amount must be greater than 0");
+            return;
+          }
+
+          // 2. Check overdraft limit
+          if (amount > availableBalance) {
+            console.log(
+              `Withdrawal exceeds overdraft limit. Available balance: $${availableBalance}`
+            );
+            return;
+          }
+
+          // 3. Deduct the amount (balance may go negative)
+          this.setBalance(realBalance - amount);
+
+          // 4. Record the transaction
+          this.recordTransaction(
+            "withdrawal",
+            amount,
+            `${this.accountHolder} withdrew (overdraft allowed)`
+          );
+
+          console.log(
+            `Withdrew: $${amount}. New Balance: $${this.getBalance()}`
+          );
+        }
+
+        //calculate interest method
+        calculateInterest(timeInMonths) {
+          console.log("Checking accounts do not accrue interest.");
+          return 0;
+        }
+
+        //Available overdraft
+        getAvailableBalanceToOverdraft() {
+          console.log(
+            `Available balance including overdraft: $${
+              this.getBalance() + this.overdraftLimit
+            }`
+          );
+          return this.getBalance() + this.overdraftLimit;
+        }
+      }
+
+      //investment account
+      class InvestmentAccount extends Account {
+        constructor(
+          accountNumber,
+          accountHolder,
+          initialBalance,
+          accountType = "investment",
+          riskLevel = "medium",
+          holdings = { stocks: [] }
+        ) {
+          super(accountNumber, accountHolder, initialBalance);
+          this.accountType = accountType;
+          this.riskLevel = riskLevel;
+          this.holdings = holdings;
+        }
+
+        #interestRate() {
+          switch (this.riskLevel) {
+            case "low":
+              return 0.2; //20%
+            case "medium":
+              return 0.35; //35%
+            case "high":
+              return 0.5; //50%
+            default:
+              return 0.25; //default 25%
+          }
+        }
+
+        //implementing interest
+        calculateInterest(timeInMonths) {
+          const interest =
+            (this.getBalance() * this.#interestRate() * timeInMonths) / 12;
+          console.log(
+            `Interest accured in ${timeInMonths} months: $${interest}`
+          );
+          return interest;
+        }
+
+        //buystocks
+        buyStocks(stockName, shares, pricePerShare) {
+          const totalCost = shares * pricePerShare;
+          if (totalCost > this.getBalance()) {
+            //check if sufficient funds are available
+            console.log("Insufficient funds to buy stocks.");
+            return;
+          }
+          this.withdraw(totalCost);
+          this.holdings.stocks.push({
+            name: stockName,
+            shares: shares,
+            price: pricePerShare,
+          });
+          console.log(
+            `Bought ${shares} shares of ${stockName} at $${pricePerShare} each.`
+          );
+        }
+
+        //sellstocks
+        sellStocks(stockName, shares, pricePerShare) {
+          const index = this.holdings.stocks.findIndex(
+            (stock) => stock.name === stockName
+          );
+
+          if (index === -1) {
+            //checks if stock is owned.
+            console.log("you don't own this stock");
+            return;
+          }
+
+          //determine number of shares that can be sold
+          //how much shares is available
+          const currentShares = this.holdings.stocks[index];
+
+          if (shares > currentShares.shares) {
+            console.log(
+              `you don't have enough shares to sell. current shares: ${currentShares.shares}`
+            );
+            return;
+          }
+
+          const totalCost = shares * pricePerShare;
+
+          this.deposit(totalCost);
+          // remove the sold shares from the owned shares
+          currentShares.shares -= shares;
+          console.log(
+            `Sold ${shares} shares of ${stockName}. Remaining: ${currentShares.shares}`
+          );
+
+          //remove stock from the holding if all shares are sold
+          if (currentShares === 0) {
+            console.log("all shares have been sold");
+            this.holdings.stocks.splice(index, 1);
+          }
+        }
+
+        //getting the total value of my portfolio
+        getPortfolioValue() {
+          let portfolioValue = 0;
+          this.holdings.stocks.forEach((stock) => {
+            const stockValue = stock.shares * stock.price;
+            //console.log(stock.shares)
+            portfolioValue += stockValue;
+          });
+
+          console.log(`you portfolio is valued at: $${portfolioValue}`);
+          return portfolioValue;
+        }
+      }
+
+      //Customer Management
+      class Customer {
+        #pin;
+        constructor(customerId, name, email, phone, address) {
+          this.customerId = customerId;
+          this.name = name;
+          this.email = email;
+          this.phone = phone;
+          this.address = address;
+          this.accounts = [];
+          this.#pin = Math.floor(1000 + Math.random() * 9000); //generate a 4 digit pin
+        }
+
+        //get pin
+        get pin() {
+          return this.#pin;
+        }
+        //validate PIN
+        validatePIN(inputPIN) {
+          return this.#pin === inputPIN;
+        }
+
+        //change PIN
+        changePIN(oldPIN, newPIN) {
+          if (this.validatePIN(oldPIN)) {
+            this.#pin = newPIN;
+            console.log("PIN changed successfully");
+          } else {
+            console.log("Invalid old PIN. PIN change failed.");
+          }
+        }
+
+        //add account to customer
+        addAccount(account) {
+          this.accounts.push(account);
+          console.log(
+            `Account number ${account.accountNumber} is been added to the accounts of customer with customer ID: ${this.customerId}`
+          );
+        }
+
+        //get accounts balance for each account
+        getAccountsBalance() {
+          const balances = this.accounts.map((acct) => {
+            return {
+              accountNumber: acct.accountNumber,
+              accountType: acct.accountType,
+              balance: acct.getBalance(),
+            };
+          });
+          return balances;
+        }
+
+        //get total balance
+        getTotalBalance() {
+          return this.accounts.reduce(
+            (sum, acct) => sum + acct.getBalance(),
+            0
+          );
+        }
+
+        //customer profile info
+        getCustomerInfo() {
+          return {
+            customerName: this.name,
+            totalBalance: this.getTotalBalance(),
+            NumOfAccounts: this.accounts.length,
+          };
+        }
+      }
+
+      //Bank class as singleton
+      class Bank {
+        static #instance = null; //  static private property to hold the single instance
+
+        //initialize private fields
+        #customers = [];
+        #currentCustomer = null; // private fields
+
+        constructor() {
+          //  static property to hold the single instance
+          if (Bank.#instance) {
+            return Bank.#instance; //returns existing instance
+          }
+
+          Bank.#instance = this; //store the instance
+        }
+
+        static getInstance() {
+          if (!Bank.#instance) {
+            Bank.#instance = new Bank();
+          }
+          return Bank.#instance;
+        }
+
+        //method to register customers
+        registerCustomers(name, email, phone, address, pin) {
+          const customerId =
+            Date.now().toString() + Math.floor(Math.random() * 1000).toString();
+
+          const newCustomer = new Customer(
+            customerId,
+            name,
+            email,
+            phone,
+            address
+          );
+          const defaultPin = newCustomer.pin; //get default pin created
+
+          newCustomer.changePIN(defaultPin, pin); //change default pin
+
+          this.#customers.push(newCustomer); //add new customer to the db.
+          console.log("Customer registered:", customerId);
+          return newCustomer;
+        }
+
+        //login method
+        login(customerId, pin) {
+          //check customers list to see if customer id exists
+          const customer = this.#customers.find((c) => {
+            return c.customerId === customerId;
+          });
+
+          if (!customer) {
+            //if customer is not found
+            console.log("Customer does not exist");
+            return false;
+          }
+          // confirm the pin
+          if (!customer.validatePIN(pin)) {
+            console.log("Incorrect Pin");
+            return false;
+          }
+
+          this.#currentCustomer = customer; //set current customer
+          console.log("Login successful");
+          return true;
+        }
+
+        //getting the current customer
+        getCurrentCustomer() {
+          return this.#currentCustomer;
+        }
+
+        //generate 10 digits account number
+        static generateAccountNumber() {
+          return Math.floor(1000000000 + Math.random() * 9000000000);
+        }
+
+        // create account
+        createAccount(accountType, initialDeposit) {
+          if (!this.#currentCustomer) {
+            //check if customer is logged in
+            console.log("Please login to create an account");
+            return null;
+          }
+
+          const holderName = this.#currentCustomer.name; //get current customer name
+          const accountNumber = Bank.generateAccountNumber(); //only the bank class can generate account number
+
+          let newAccount;
+
+          switch (accountType) {
+            case "savings":
+              newAccount = new SavingsAccount(
+                accountNumber,
+                holderName,
+                initialDeposit
+              );
+              console.log("New Savings account created");
+              return newAccount;
+            case "checkings":
+              newAccount = new CheckingAccount(
+                accountNumber,
+                holderName,
+                initialDeposit
+              );
+              console.log("New checking account created");
+              return newAccount;
+            case "investment":
+              newAccount = new InvestmentAccount(
+                accountNumber,
+                holderName,
+                initialDeposit
+              );
+              console.log("New investment account created");
+              return newAccount;
+            default:
+              console.log("Invalid account type");
+              return;
+          }
+        }
+
+        //method to get All customers
+        getAllCustomers() {
+          return this.#customers;
+        }
+      }
+
+      //Utilities
+
+      //transaction class
+      class Transaction {
+        static lastId = 0; // shared across all transactions
+
+        constructor(
+          type,
+          amount,
+          description,
+          balanceAfter,
+          date = new Date()
+        ) {
+          this.id = Transaction.generateId();
+          this.type = type;
+          this.amount = amount;
+          this.date = date;
+          this.description = description;
+          this.balanceAfter = balanceAfter;
+        }
+
+        static generateId() {
+          return ++Transaction.lastId; // increments and returns
+        }
+
+        getFormattedDate() {
+          return this.date.toLocaleString();
+        }
+      }
+
+      //validator class
+      class Validator {
+        // Validate email using a basic regex pattern
+        static validateEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email);
+        }
+
+        // Validate phone number (Nigerian format example: 11 digits or starts with +234)
+        static validatePhone(phone) {
+          const phoneRegex = /^(?:\+234|0)\d{10}$/;
+          return phoneRegex.test(phone);
+        }
+
+        // Validate pin (must be exactly 4 digits)
+        static validatePin(pin) {
+          const pinRegex = /^\d{4}$/;
+          return pinRegex.test(pin);
+        }
+
+        // Validate amount (must be a number and must be > 0)
+        static validateAmount(amount) {
+          return typeof amount === "number" && amount > 0;
+        }
+      } //get bank instance
+      const bank = Bank.getInstance();
+
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); //prevent form submission
+
+          const customerId = document.getElementById("login-customerID").value;
+          const pin = document.getElementById("login-pin").value;
+
+          const loginSuccess = bank.login(customerId, pin);
+
+          if (loginSuccess) {
+            //hide auth section and show dashboard
+            document.querySelector(".auth-container").style.display = "none";
+            document.getElementById("dashboard-section").style.display =
+              "block";
+
+            //display user info
+            const currentCustomer = bank.getCurrentCustomer();
+            document.getElementById("user-name-display").textContent =
+              currentCustomer.name;
+            document.getElementById("user-id-display").textContent =
+              currentCustomer.customerId;
+          } else {
+            alert("Login failed. Please check your Customer ID and Pin.");
+          }
+        });
+
+      document
+        .getElementById("logout-button")
+        .addEventListener("click", function () {
+          // Clear current customer
+          bank.currentCustomer = null;
+
+          // Show auth section and hide dashboard
+          document.querySelector(".auth-container").style.display = "block";
+          document.getElementById("dashboard-section").style.display = "none";
+        });
+
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Prevent form submission
+
+          const name = document.getElementById("register-name").value;
+          const email = document.getElementById("register-email").value;
+          const pin = document.getElementById("register-pin").value;
+          const phone = document.getElementById("register-phone").value;
+          const address = document.getElementById("register-address").value;
+
+          // Validate inputs
+          if (!Validator.validateEmail(email)) {
+            alert("Invalid email format.");
+            return;
+          }
+          if (!Validator.validatePhone(phone)) {
+            alert("Invalid phone number format.");
+            return;
+          }
+          if (!Validator.validatePin(pin)) {
+            alert("Pin must be exactly 4 digits.");
+            return;
+          }
+
+          // Register customer
+          const newCustomer = bank.registerCustomers(
+            name,
+            email,
+            phone,
+            address,
+            pin
+          );
+
+          alert(
+            `Registration successful! Your Customer ID is: ${newCustomer.customerId}`
+          );
+
+          // Switch to login tab after registration
+          document.getElementById("login-tab").click();
+          // Autofill the ID for better UX
+          document.getElementById("login-customerID").value =
+            newCustomer.customerId;
+        });
+
+      const openAccountButton = document.getElementById("open-account-button");
+      const accountModal = document.getElementById("account-modal");
+      const closeModal = () => {
+        accountModal.style.display = "none"; // Hide the modal
+      };
+
+      openAccountButton.addEventListener("click", () => {
+        accountModal.style.display = "flex"; // Show the modal
+      });
+
+      const handleCreateAccount = (e) => {
+        e.preventDefault(); // Prevent form submission
+
+        const accountTypeSelect = document.getElementById("account-type");
+        const initialDepositInput = document.getElementById("initial-deposit");
+
+        const accountType = accountTypeSelect.value;
+        const initialDeposit = parseFloat(initialDepositInput.value);
+
+        // Validate inputs
+        if (!accountType) {
+          alert("Please select an account type.");
+          return;
+        }
+        if (!Validator.validateAmount(initialDeposit)) {
+          alert("Initial deposit must be a positive number.");
+          return;
+        }
+
+        // Add account to current customer
+        const currentCustomer = bank.getCurrentCustomer();
+
+        //check if the type account that want to be created already exists for the current customer
+        const alreadyExists = currentCustomer.accounts.some((account) => {
+          return (
+            account.accountType.toLowerCase() === accountType.toLowerCase()
+          );
+        });
+
+        if (alreadyExists) {
+          alert(
+            `You already have a ${accountType} account. Cannot create duplicate accounts of the same type.`
+          );
+          return;
+        }
+        const newAccount = bank.createAccount(
+          accountType.toLowerCase(),
+          initialDeposit
+        );
+
+        if (newAccount) {
+          currentCustomer.addAccount(newAccount);
+
+          alert(
+            `New ${accountType} account created successfully! Account Number: ${newAccount.accountNumber}`
+          );
+
+          // Close the modal
+          closeModal();
+
+          // Display updated accounts on dashboard
+          displayAccounts();
+
+          // Reset the form
+          document.getElementById("new-account-form").reset();
+        } else {
+          alert("Account creation failed. Please try again.");
+        }
+      };
+
+      // get all accounts of current customer and display on dashboard
+      const displayAccounts = () => {
+        const currentCustomer = bank.getCurrentCustomer();
+        const createdAccounts = currentCustomer ? currentCustomer.accounts : [];
+        console.log(createdAccounts);
+
+        const cardsGrid = document.getElementById("cards-grid");
+
+        // Clear existing cards
+        cardsGrid.innerHTML = "";
+        // Create and append account cards
+        createdAccounts.forEach((account) => {
+          const accountCard = document.createElement("div");
+          accountCard.classList.add("account-card");
+          console.log(account.accountNumber);
+          console.log(account.accountType);
+          console.log(account.getBalance());
+
+          accountCard.innerHTML = `
+          <h3>Account No: ${account.accountNumber}</h3>
+
+          <p>Type: ${account.accountType}</p>
+          <p>Balance: $${account.getBalance().toFixed(2)}</p>
+        `;
+
+          cardsGrid.appendChild(accountCard);
+        });
+      };
+
+      //displayAccounts();
+    </script>
+  </body>
+</html>

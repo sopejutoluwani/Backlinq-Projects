@@ -11,38 +11,38 @@ class Account {
   }
 
   deposit(amount) {
-    if (amount <= 0) {
+    //check whether amount is valid that is greater than 0
+    if (amount < 0) {
       console.log("Deposited amount must be greater than 0");
       return;
     }
 
-    if (amount >= 0) {
-      this.#balance += amount;
-      //console.log(`Deposited: $${amount}. New Balance: $${this.#balance}`);
-      this.#recordtransaction(
-        "deposit",
-        amount,
-        `${this.accountHolder} deposited`
-      );
-    }
+    //proceed to deposit
+    this.#balance += amount;
+    //console.log(`Deposited: $${amount}. New Balance: $${this.#balance}`);
+    this.#recordtransaction(
+      "deposit",
+      amount,
+      `${this.accountHolder} deposited`
+    );
   }
 
   withdraw(amount) {
-    if (amount <= 0) {
+    //check whether amount is valid that is greater than 0
+    if (amount < 0) {
       console.log("Amount must be greater than 0");
       return;
     }
 
+    //check whether amount is greater than balance
     if (amount > this.#balance) {
-      console.log("Warning: withdrawing more than balance!");
-      this.#balance -= amount; // allows negative balance
-    } else {
-      this.#balance -= amount;
+      console.log("Warning: Insufficient funds!");
+      return;
     }
 
     if (amount <= this.#balance) {
       this.#balance -= amount;
-      //console.log(`Withdrew: $${amount}. New Balance: $${this.#balance}`);
+      console.log(`Withdrew: $${amount}. New Balance: $${this.#balance}`);
       this.#recordtransaction(
         "withdrawal",
         amount,
@@ -54,6 +54,15 @@ class Account {
   getBalance() {
     console.log(`Current Balance: $${this.#balance}`);
     return this.#balance;
+  }
+
+  adjustBalance(amount) {
+    this.#balance += amount;
+  }
+
+  setBalance(newBalance) {
+    this.#balance = newBalance;
+    console.log(`Current Balance + Overdraft: $${this.#balance}`);
   }
 
   transfer(targetAccount, amount) {
@@ -84,6 +93,10 @@ class Account {
     //console.log(this.#transactionsHistory)
   }
 
+  recordTransaction(type, amount, description) {
+    this.#transactionsHistory.push(type, amount, description);
+  }
+
   getTransactionHistory() {
     console.log(this.#transactionsHistory);
     return this.#transactionsHistory;
@@ -107,11 +120,16 @@ class SavingsAccount extends Account {
   constructor(
     accountNumber,
     accountHolder,
-    initialBalance,
+    initialDeposit,
+    accountType = "savings",
     interestRate = 0.3,
     minimumBalance = 100
-  ) {
-    super(accountNumber, accountHolder, initialBalance);
+  ){
+    if (initialDeposit < minimumBalance) {  
+      throw new Error(`Initail deposit must be at least $${minimumBalance}`)
+  } 
+    super(accountNumber, accountHolder, initialDeposit);
+    this.accountType = accountType;
     this.interestRate = interestRate;
     this.minimumBalance = minimumBalance;
   }
@@ -148,19 +166,57 @@ class CheckingAccount extends Account {
     accountNumber,
     accountHolder,
     initialBalance,
+    accountType='checkings',
     overdraftLimit = 500
   ) {
     super(accountNumber, accountHolder, initialBalance);
+    this.accountType = accountType;
     this.overdraftLimit = overdraftLimit;
   }
 
   //Overriding withdraw method
+  // my solution
+  // withdraw(amount) {
+  //   const availableBalance = this.getBalance() + this.overdraftLimit;
+  //   this.setBalance(availableBalance)
+  //   if (amount > availableBalance) {
+  //     console.log("Withdrawal exceeds overdraft limit. Available balance: $"+availableBalance);
+  //     return;
+  //   }
+  //   if (amount <= this.getBalance())  {
+  //     super.withdraw(amount);
+  //     }
+  //   }
+
   withdraw(amount) {
-    if (amount > this.getBalance() + this.overdraftLimit) {
-      console.log("Withdrawal exceeds overdraft limit.");
+    const realBalance = this.getBalance();
+    const availableBalance = realBalance + this.overdraftLimit;
+
+    // 1. Validate amount
+    if (amount <= 0) {
+      console.log("Amount must be greater than 0");
       return;
     }
-    super.withdraw(amount); //call parent class withdraw method
+
+    // 2. Check overdraft limit
+    if (amount > availableBalance) {
+      console.log(
+        `Withdrawal exceeds overdraft limit. Available balance: $${availableBalance}`
+      );
+      return;
+    }
+
+    // 3. Deduct the amount (balance may go negative)
+    this.setBalance(realBalance - amount);
+
+    // 4. Record the transaction
+    this.recordTransaction(
+      "withdrawal",
+      amount,
+      `${this.accountHolder} withdrew (overdraft allowed)`
+    );
+
+    console.log(`Withdrew: $${amount}. New Balance: $${this.getBalance()}`);
   }
 
   //calculate interest method
@@ -186,10 +242,12 @@ class InvestmentAccount extends Account {
     accountNumber,
     accountHolder,
     initialBalance,
+    accountType = "investment",
     riskLevel = "medium",
     holdings = { stocks: [] }
   ) {
     super(accountNumber, accountHolder, initialBalance);
+    this.accountType = accountType;
     this.riskLevel = riskLevel;
     this.holdings = holdings;
   }
@@ -497,7 +555,7 @@ class Transaction {
 
   getFormattedDate() {
     return this.date.toLocaleString();
-  } 
+  }
 }
 
 //validator class
@@ -526,13 +584,15 @@ class Validator {
   }
 }
 
-export default Validator;
-// const acct1 = new InvestmentAccount(12345679809, "tolu");
-// const acct2 = new Account(5555555555, newCheckingAccount
-// acct1.deposit(10000);
-// acct1.riskLevel = "low";
-// //acct1.calculateInterest(8);
-// // acct1.withdraw(500);
+// export default Validator;
+// const acct1 = new CheckingAccount(12345679809, "tolu");
+// // const acct2 = new Account(5555555555, newCheckingAccount
+// acct1.deposit(1000);
+// // acct1.riskLevel = "low";
+// // //acct1.calculateInterest(8);
+// acct1.withdraw(1390);
+// acct1.withdraw(110);
+// acct1.getBalance();
 // // acct1.transfer(acct2, 400);
 // // acct1.getTransactionHistory();
 // // acct2.getTransactionHistory()
@@ -561,18 +621,51 @@ export default Validator;
 // checkingAcct.getAvailableBalanceToOverdraft();
 // customer1.getTotalBalance();
 
-const bank = Bank.getInstance();
-const cust = bank.registerCustomers(
-  "John",
-  "john@gmail.com",
-  "0801...",
+// instantiate the bank
+const myBank = Bank.getInstance();
+
+//register a new customer
+const customer1 = myBank.registerCustomers(
+  "Tolu Ade",
+  "toluade@example.com",
+  "08012345678",
   "Lagos",
   2222
 );
-console.log(`Customer ID: ${cust.customerId}`);
-bank.login(cust.customerId, 2222);
-const savingsAccount = bank.createAccount("savings", 5000);
-const checkingAccount = bank.createAccount("checking", 2000);
-cust.addAccount(savingsAccount);
-cust.addAccount(checkingAccount);
-console.log(cust.getAccountsBalance());
+//login the customer
+const isLoggedIn = myBank.login(customer1.customerId, 2222);
+
+if (isLoggedIn) {
+  //create a savings account for the logged in customer
+  const mySavings = myBank.createAccount("savings", 500);
+  //add account to customer profile
+  customer1.addAccount(mySavings);
+
+  //perform some transactions
+  mySavings.deposit(200);
+  mySavings.withdraw(100);
+  mySavings.getBalance();
+  mySavings.calculateInterest(6);
+
+  //create a checking account for the logged in customer
+  const myChecking = myBank.createAccount("checking", 300);
+  //add account to customer profile
+  customer1.addAccount(myChecking);
+
+  //perform some transactions
+  myChecking.withdraw(600); //within overdraft limit
+  myChecking.getAvailableBalanceToOverdraft();
+  myChecking.deposit(400);
+  myChecking.getBalance();
+
+  //create an investment account for the logged in customer
+  const myInvestment = myBank.createAccount("investment", 1000);
+  //add account to customer profile
+  customer1.addAccount(myInvestment);
+
+  //get current customer info
+
+  const currentCustomer = myBank.getCurrentCustomer();
+  //console.log(currentCustomer.getCustomerInfo());
+  console.log(currentCustomer.getAccountsBalance());
+}
